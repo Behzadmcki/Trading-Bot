@@ -36,10 +36,22 @@ def ComputeIchimokuCloud(df):
 	period52_low = df['low'].rolling(window=52).min()
 	df['senkou_b'] = ((period52_high + period52_low) / 2).shift(52)
 
-	# Chikou Span: Most recent closing price, plotted 26 periods behind (optional)
+	# Chikou Span: Most recent closing price,
+	#  plotted 26 periods behind (optional)
 	df['chikouspan'] = df['close'].shift(-26)
 
 	return df
+
+def ComputeMACD(df):
+	"""computeMACD inpts : data """
+	print("macd indicator colums ")
+	df["macd"]=moving_average_convergence_divergence(df['close'].tolist(),12,26)
+	df["signal"]=ema(data=df["macd"].tolist(),period=9)
+
+	df["diffrence"]=df["macd"]-df["signal"]
+	return df
+
+
 
 
 
@@ -60,7 +72,7 @@ class Indicators:
 		"ema": ema,
 		"lbb": lbb,
 		"ubb": ubb,
-		#"macd":MACD,
+		"macd":ComputeMACD,
 		"ichimoku": ComputeIchimokuCloud,
 	}
 
@@ -74,6 +86,9 @@ class Indicators:
 			if indicator_name == "ichimoku": 
 				# this is a special case, because it will create more columns in the df
 				df = ComputeIchimokuCloud(df)
+			elif indicator_name=="macd":
+
+				df=ComputeMACD(df)	
 			else:
 				# remember here how we used to compute the other indicators inside 
 				# TradingModel: self.df['fast_sma'] = sma(self.df['close'].tolist(), 10)
@@ -81,3 +96,4 @@ class Indicators:
 		except Exception as e:
 			print("\nException raised when trying to compute "+indicator_name)
 			print(e)
+

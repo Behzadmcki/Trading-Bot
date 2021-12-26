@@ -23,10 +23,10 @@ class StrategyEvaluator:
 	def backtest(self,
 	model,
 	starting_balance:float = 100,
-	initial_profits:float = 1.045,
-	initial_stop_loss:float = 0.85,
+	initial_profits:float = 1.1,
+	initial_stop_loss:float = 0.95,
 	incremental_profits:float = 1.04,
-	incremental_stop_loss:float = 0.975):
+	incremental_stop_loss:float = 0.98):
 		'''
 		Function used to backtest a strategy given a TradingModel model
 
@@ -47,7 +47,7 @@ class StrategyEvaluator:
 
 		if initial_profits <= 1:
 			AssertionError("initial_profits should be greater than 1!")
-
+		print(f"initial_profits={initial_profits}initial_stop_loss={initial_stop_loss} incremental_profits={incremental_profits} incremental_stop_loss={incremental_stop_loss}")
 		df = model.df
 		df["actual_time"] = pd.to_datetime(df['time'],unit="s")
 
@@ -87,9 +87,11 @@ class StrategyEvaluator:
 				# EITHER the stop loss price OR the target price
 				stop_loss_price = last_buy["price"] * stop_loss
 				next_target_price = last_buy["price"] * profit_target
+				# print(f"{i} th candle and stoploss is {stop_loss_price} and next target is {next_target_price}")
 
 				if df['low'][i] < stop_loss_price:
 					# If price went below our stop_loss, we sold at that point
+					print(f"the target hit the stop loss : {stop_loss_price} for buy price :{buy_price} for {stop_loss_price/buy_price} percent ")
 					sell_times.append([df["actual_time"][i], stop_loss_price])
 					resulting_balance = resulting_balance * (stop_loss_price / buy_price)
 
@@ -99,6 +101,7 @@ class StrategyEvaluator:
 				elif df['high'][i] > next_target_price:
 					# If price went above our target, it means we increased our stop loss 
 					# and set our next target
+					# print(f"{i} th candle and stoploss is {stop_loss_price} and next target is {next_target_price}")
 					last_buy = {
 						"index" : i,
 						"price" : Decimal(next_target_price)

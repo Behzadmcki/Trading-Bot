@@ -5,6 +5,7 @@ from strategies.ichimokuBullish import *
 from strategies.bollStrategy import *
 from strategies.rsiStrategy import *
 from strategies.testStrategy import *
+from strategies.MACDStrategy import *
 from exchange_market.coinex import Coinex
 from TradingModel import TradingModel
 import json
@@ -16,7 +17,9 @@ strategies_dict = dict(
 	bollinger_simple = bollStrategy,
 	ichimoku_bullish = ichimokuBullish,
 	rsi_strategy=rsiStrategy,
-	test_strategy=testStrategy
+	test_strategy=testStrategy,
+	macd_strategy=MACDStrategy
+
 
 )
 
@@ -27,8 +30,8 @@ strategies_dict = dict(
 
 # We will update this function a little bit, to make it more customizable
 def BacktestStrategies(symbols=[], interval='4hour', plot=False, strategy_evaluators=[], 
-options = dict(starting_balance=100, initial_profits = 1.012, initial_stop_loss = 0.9, 
-incremental_profits = 1.006, incremental_stop_loss = 0.996)):
+options = dict(starting_balance=100, initial_profits = 1.03, initial_stop_loss = 0.99, 
+incremental_profits = 1.006, incremental_stop_loss = 0.998)):
 	coins_tested = 0
 	trade_value = options['starting_balance']
 	for symbol in symbols:
@@ -131,15 +134,16 @@ opening_text = "\nWelcome to Tudor's Crypto Trading Bot. \n \
 def Main():
 
 	exchange = Coinex()
-	symbols = exchange.market_list(quoteAssets=["BTCUSDT","ETHUSDT"])
+	symbols = exchange.market_list(quoteAssets=["BTCUSDT"])
 
 	strategy_evaluators = [
-		StrategyEvaluator(strategy_function=strategies_dict["ma_simple"]),
-		StrategyEvaluator(strategy_function=strategies_dict["bollinger_simple"]),
-		StrategyEvaluator(strategy_function=strategies_dict["ichimoku_bullish"]),
-		StrategyEvaluator(strategy_function=strategies_dict['ma_crossover']),
-		StrategyEvaluator(strategy_function=strategies_dict['rsi_strategy']),
-		StrategyEvaluator(strategy_function=strategies_dict['test_strategy'])
+		# StrategyEvaluator(strategy_function=strategies_dict["ma_simple"]),
+		# StrategyEvaluator(strategy_function=strategies_dict["bollinger_simple"]),
+		# StrategyEvaluator(strategy_function=strategies_dict["ichimoku_bullish"]),
+		# StrategyEvaluator(strategy_function=strategies_dict['ma_crossover']),
+		# StrategyEvaluator(strategy_function=strategies_dict['rsi_strategy']),
+		# StrategyEvaluator(strategy_function=strategies_dict['test_strategy']),
+		StrategyEvaluator(strategy_function=strategies_dict['macd_strategy'])
 	]
 
 	print(opening_text)
@@ -152,7 +156,7 @@ def Main():
 	if answer == 'e':
 		EvaluateStrategies(symbols=symbols, interval='1hour', strategy_evaluators=strategy_evaluators)
 	if answer == 'b':
-		BacktestStrategies(symbols=symbols, interval='5min', plot=True, strategy_evaluators=strategy_evaluators)
+		BacktestStrategies(symbols=symbols, interval='1hour', plot=True, strategy_evaluators=strategy_evaluators)
 	if answer == 'q':
 		print("\nBYE!\n")
 

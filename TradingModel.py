@@ -22,7 +22,7 @@ class TradingModel:
 		self.symbol = symbol
 		self.timeframe = timeframe
 		self.exchange = Coinex()
-		self.df = self.exchange.get_ohlcv(symbol,timeframe,1000)
+		self.df = self.exchange.get_ohlcv(symbol,timeframe,500)
 		self.helkinAshi_chart=helkin_ashi
 		if helkin_ashi==True:
 			self.helkinAshi_df=self.exchange.helkin_ashi(symbol, timeframe, 100)
@@ -136,7 +136,25 @@ class TradingModel:
 				y = df['rsi'],
 				name = "rsi",
 				line = dict(color = ('rgba(240, 160, 160, 50)'))),row=2,col=1)
-
+		
+		if df.__contains__('macd'):
+			fig.append_trace(go.Scatter(
+				x = df["actual_time"],
+				y = df['macd'],
+				name = "macd",
+				line = dict(color = ('rgba(240, 0, 160, 50)'))),row=2,col=1)
+		if df.__contains__('signal'):
+			fig.append_trace(go.Scatter(
+				x = df["actual_time"],
+				y = df['signal'],
+				name = "signal",
+				line = dict(color = ('rgba(240, 160, 0, 50)'))),row=2,col=1)
+		if df.__contains__('diffrence'):
+			fig.append_trace(go.Scatter(
+				x = df["actual_time"],
+				y = df['diffrence'],
+				name = "diffrence",
+				line = dict(color = ('rgba(0, 160, 160, 50)'))),row=2,col=1)
 
 
 		if buy_signals:
@@ -156,9 +174,14 @@ class TradingModel:
 				mode = "markers",
 				marker_size = 20
 			),row=1,col=1)
+		if df.__contains__('rsi'):
+			fig.add_hline(y=30,line_dash="dash",line_color="white",row=2,col=1)
+			fig.add_hline(y=70,line_dash="dash",line_color="white",row=2,col=1)	
+		elif df.__contains__('macd'):
+			fig.add_hline(y=10,line_dash="dash",line_color="white",row=2,col=1)
+			fig.add_hline(y=-10,line_dash="dash",line_color="white",row=2,col=1)		
 
-		fig.add_hline(y=30,line_dash="dash",line_color="white",row=2,col=1)
-		fig.add_hline(y=70,line_dash="dash",line_color="white",row=2,col=1)	
+
 		if self.helkinAshi_chart==True: 
 			fig2 = make_subplots(rows=1, cols=1)
 			fig2.append_trace(go.Candlestick(
