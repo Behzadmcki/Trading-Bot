@@ -69,6 +69,7 @@ class StrategyEvaluator:
 			if last_buy is None:
 				# No, then check whether the strategy is fulfilled at this point in time
 				strategy_result = self.strategy(model.df, i)
+				
 
 				if strategy_result:
 					# IF strategy fulfilled, buy some amount of coin
@@ -82,7 +83,7 @@ class StrategyEvaluator:
 					stop_loss = Decimal(initial_stop_loss)
 					profit_target = Decimal(initial_profits)
 
-			elif last_buy is not None and i > last_buy["index"] + 1:
+			elif last_buy is not None and i > last_buy["index"] + 1 :
 				# Yes (we already bought) so check whether the price has hit 
 				# EITHER the stop loss price OR the target price
 				stop_loss_price = last_buy["price"] * stop_loss
@@ -91,7 +92,7 @@ class StrategyEvaluator:
 
 				if df['low'][i] < stop_loss_price:
 					# If price went below our stop_loss, we sold at that point
-					print(f"the target hit the stop loss : {stop_loss_price} for buy price :{buy_price} for {stop_loss_price/buy_price} percent ")
+					# print(f"the target hit the stop loss : {stop_loss_price} for buy price :{buy_price} for {stop_loss_price/buy_price} percent ")
 					sell_times.append([df["actual_time"][i], stop_loss_price])
 					resulting_balance = resulting_balance * (stop_loss_price / buy_price)
 

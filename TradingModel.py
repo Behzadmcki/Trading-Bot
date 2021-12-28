@@ -22,10 +22,11 @@ class TradingModel:
 		self.symbol = symbol
 		self.timeframe = timeframe
 		self.exchange = Coinex()
-		self.df = self.exchange.get_ohlcv(symbol,timeframe,500)
 		self.helkinAshi_chart=helkin_ashi
 		if helkin_ashi==True:
-			self.helkinAshi_df=self.exchange.helkin_ashi(symbol, timeframe, 100)
+			self.df=self.exchange.helkin_ashi(symbol, timeframe, 500)
+		else:
+			self.df = self.exchange.get_ohlcv(symbol,timeframe,500)
 			
 		self.last_price = self.df['close'][len(self.df['close'])-1]
 
@@ -77,8 +78,26 @@ class TradingModel:
 				x = df["actual_time"],
 				y = df['20_ema'],
 				name = "20_ema",
-				line = dict(color = ('rgba(255, 207, 102, 50)'))),row=1,col=1)			
-		
+				line = dict(color = ('rgba(255, 207, 102, 50)'))),row=1,col=1)	
+		if df.__contains__('30_ema'):
+			fig.append_trace(go.Scatter(
+				x = df["actual_time"],
+				y = df['30_ema'],
+				name = "30_ema",
+				line = dict(color = ('rgba(255, 0, 102, 50)'))),row=1,col=1)
+		if df.__contains__('10_ema'):
+			fig.append_trace(go.Scatter(
+				x = df["actual_time"],
+				y = df['10_ema'],
+				name = "10_ema",
+				line = dict(color = ('rgba(255, 207, 0, 50)'))),row=1,col=1)								
+
+		if df.__contains__('12_ema'):
+			fig.append_trace(go.Scatter(
+				x = df["actual_time"],
+				y = df['12_ema'],
+				name = "12_ema",
+				line = dict(color = ('#5F9EA0'))),row=1,col=1)		
 
 
 		if df.__contains__('low_boll'):
@@ -128,6 +147,13 @@ class TradingModel:
 				name = "Senkou B",
 				fill = "tonexty",
 				line = dict(color = ('rgba(240, 160, 160, 50)'))),row=1,col=1)
+				
+		if df.__contains__('chikouspan'):
+			fig.append_trace(go.Scatter(
+				x = df["actual_time"],
+				y = df['chikouspan'],
+				name = "Chikouspan",
+				line = dict(color = ('#00FFFF'))),row=1,col=1)
 
 		
 		if df.__contains__('rsi'):
@@ -163,7 +189,7 @@ class TradingModel:
 					y = [item[1] for item in buy_signals],
 					name = "Buy Signals",
 					mode = "markers",
-					marker_size = 20
+					marker_size = 10,fillcolor='#008000'
 				),row=1,col=1)
 
 		if sell_signals:
@@ -172,7 +198,7 @@ class TradingModel:
 				y = [item[1] for item in sell_signals],
 				name = "Sell Signals",
 				mode = "markers",
-				marker_size = 20
+				marker_size = 10,fillcolor='#FF7F50'
 			),row=1,col=1)
 		if df.__contains__('rsi'):
 			fig.add_hline(y=30,line_dash="dash",line_color="white",row=2,col=1)
@@ -185,12 +211,42 @@ class TradingModel:
 		if self.helkinAshi_chart==True: 
 			fig2 = make_subplots(rows=1, cols=1)
 			fig2.append_trace(go.Candlestick(
-				x =self.helkinAshi_df['time'],
-				open = self.helkinAshi_df['open'],
-				close = self.helkinAshi_df['close'],
-				high = self.helkinAshi_df['high'],
-				low = self.helkinAshi_df['low'],
+				x =self.df['actual_time'],
+				open = self.df['HA_Open'],
+				close = self.df['HA_Close'],
+				high = self.df['HA_High'],
+				low = self.df['HA_Low'],
 				name = "Candlesticks"),row=1,col=1)
+
+			if buy_signals:
+				fig2.append_trace(go.Scatter(
+					x = [item[0] for item in buy_signals],
+					y = [item[1] for item in buy_signals],
+					name = "Buy Signals",
+					mode = "markers",
+					marker_size = 10,fillcolor='#008000'
+				),row=1,col=1)
+
+			if sell_signals:
+				fig2.append_trace(go.Scatter(
+					x = [item[0] for item in sell_signals],
+					y = [item[1] for item in sell_signals],
+					name = "Sell Signals",
+					mode = "markers",
+					marker_size = 10,fillcolor='#FF7F50'
+				),row=1,col=1)
+			if df.__contains__('30_ema'):
+				fig2.append_trace(go.Scatter(
+					x = df["actual_time"],
+					y = df['30_ema'],
+					name = "30_ema",
+					line = dict(color = ('rgba(255, 0, 102, 50)'))),row=1,col=1)
+			if df.__contains__('10_ema'):
+				fig2.append_trace(go.Scatter(
+					x = df["actual_time"],
+					y = df['10_ema'],
+					name = "10_ema",
+					line = dict(color = ('rgba(255, 207, 0, 50)'))),row=1,col=1)		
 			fig2.update_layout(xaxis_rangeslider_visible=False,template="plotly_dark")
 			plot(fig2, filename='./'+"helkin_ashi"+'.html')
 		# style and display

@@ -12,6 +12,7 @@ import collections
 import hashlib
 import requests
 import pyti.relative_strength_index as RSI
+import numpy as np
 
 
 
@@ -356,16 +357,21 @@ class Coinex(data.Data):
     def helkin_ashi(self, __market: str,__type: str,__limit: int):
 
         df = self.get_ohlcv(__market,__type,__limit)
-        df_shifted=df.shift(periods=1)
-        HelkinAshi_df=pd.DataFrame()
-        HelkinAshi_df["close"]=(df["close"]+df["open"]+df["high"]+df["low"])/4
-        HelkinAshi_df["open"]=(df_shifted["close"]+df_shifted["open"])/2
-        HelkinAshi_df["high"]=df["high"]
-        HelkinAshi_df["low"]=df["low"]
-        HelkinAshi_df["time"]=df["time"]
+        df['HA_Close']=(df['open']+ df['high']+ df['low']+df['close'])/4
+        df["HA_Open"]=0
+        for i in range(0, len(df)):
+            if i == 0:
+                df["HA_Open"][i]=(df["open"][i]+df["close"][i])/2
+            else:
+                df["HA_Open"][i]=(df["HA_Open"][i-1]+df["HA_Close"][i-1])/2
+
+        df['HA_High']=df[['HA_Open','HA_Close','high']].max(axis=1)
+        df['HA_Low']=df[['HA_Open','HA_Close','low']].min(axis=1)
+        df["test"]=df["HA_Open"]-df["HA_Low"]
+        print(df.head(100))
         
 
-        return HelkinAshi_df
+        return df
         
         
        

@@ -36,7 +36,7 @@ incremental_profits = 1.006, incremental_stop_loss = 0.998)):
 	trade_value = options['starting_balance']
 	for symbol in symbols:
 		print(symbol)
-		model = TradingModel(symbol=symbol, timeframe=interval, helkin_ashi=False)
+		model = TradingModel(symbol=symbol, timeframe=interval, helkin_ashi=True)
 		for evaluator in strategy_evaluators:
 			resulting_balance = evaluator.backtest(
 				model,
@@ -80,8 +80,8 @@ ask_place_order = "\nType 'p' then ENTER if you want to Place an Order \
 	\nTyping anything else or pressing ENTER directly will skip placing an order this time.\n"
 
 def EvaluateStrategies(symbols=[], strategy_evaluators=[], interval='1hour', 
-options = dict(starting_balance=100, initial_profits = 1.012, initial_stop_loss = 0.9, 
-incremental_profits = 1.006, incremental_stop_loss = 0.996)):
+options = dict(starting_balance=100, initial_profits = 1.008, initial_stop_loss = 0.996, 
+incremental_profits = 1.004, incremental_stop_loss = 0.998)):
 	for symbol in symbols:
 		print(symbol)
 		model = TradingModel(symbol=symbol, timeframe=interval,helkin_ashi=True)
@@ -142,8 +142,8 @@ def Main():
 		# StrategyEvaluator(strategy_function=strategies_dict["ichimoku_bullish"]),
 		# StrategyEvaluator(strategy_function=strategies_dict['ma_crossover']),
 		# StrategyEvaluator(strategy_function=strategies_dict['rsi_strategy']),
-		# StrategyEvaluator(strategy_function=strategies_dict['test_strategy']),
-		StrategyEvaluator(strategy_function=strategies_dict['macd_strategy'])
+		StrategyEvaluator(strategy_function=strategies_dict['test_strategy']),
+		# StrategyEvaluator(strategy_function=strategies_dict['macd_strategy'])
 	]
 
 	print(opening_text)
@@ -156,7 +156,7 @@ def Main():
 	if answer == 'e':
 		EvaluateStrategies(symbols=symbols, interval='1hour', strategy_evaluators=strategy_evaluators)
 	if answer == 'b':
-		BacktestStrategies(symbols=symbols, interval='1hour', plot=True, strategy_evaluators=strategy_evaluators)
+		BacktestStrategies(symbols=symbols, interval='30min', plot=True, strategy_evaluators=strategy_evaluators)
 	if answer == 'q':
 		print("\nBYE!\n")
 
